@@ -4,6 +4,71 @@
   
     
     <entry>
+      <title></title>
+      <link href="/blog/2023/04/04/java-ruo-yin-yong-weakreference-de-li-jie-yu-shi-yong/"/>
+      <url>/blog/2023/04/04/java-ruo-yin-yong-weakreference-de-li-jie-yu-shi-yong/</url>
+      
+        <content type="html"><![CDATA[<p><strong>弱引用引入的原因</strong><br>正常情况下，当一个对象o被创建时, 它被放在Heap里. 当GC运行的时候, 如果发现没有任何引用指向o, o就会被回收以腾出内存空间。<br>一个对象被回收，必须同时满足两个条件：</p><ol><li>没有任何引用指向它</li><li>GC被运行</li></ol><p>在现实情况写代码的时候, 我们往往通过把所有指向某个对象的referece置空来保证这个对象在下次GC运行的时候被回收 (可以用java -verbose:gc来观察gc的行为)。<br><code>Object c = new Car(); c=null;</code><br>但是, 手动置空对象对于程序员来说, 是一件繁琐且违背自动回收的理念的.  对于简单的情况, 手动置空是不需要程序员来做的, 因为在java中, 对于简单对象, 当调用它的方法执行完毕后, 指向它的引用会被从stack中popup, 所以他就能在下一次GC执行时被回收了。<br>但是, 也有特殊例外. 当使用cache的时候, 由于cache的对象正是程序运行需要的, 那么只要程序正在运行, cache中的引用就不会被GC给(或者说, cache中的reference拥有了和主程序一样的life cycle). 那么随着cache中的reference越来越多, GC无法回收的object也越来越多, 无法被自动回收. 当这些object需要被回收时, 回收这些object的任务只有交给程序编写者了. 然而这却违背了GC的本质(自动回收可以回收的objects).<br><strong>弱引用的使用</strong><br>所以, java中引入了weak reference. 相对于前面举例中的strong reference:<br><code>Object c = new Car(); //只要c还指向car object, car object就不会被回收</code><br> 当一个对象仅仅被weak reference指向, 而没有任何其他strong reference指向的时候, 如果GC运行, 那么这个对象就会被回收. weak reference的语法是:<br><code>WeakReference&lt;Car&gt; weakCar = new WeakReference(Car)(car);</code><br>     当要获得weak reference引用的object时, 首先需要判断它是否已经被回收:<br><code>weakCar.get();</code><br>具体例子及其使用情况：<br>package weakreference;</p><p>import java.lang.ref.WeakReference; /** * @author wison */<br>public class TestWeakReference {</p><pre><code>public static void main(String[] args) {        Car car = new Car(22000,"silver");    WeakReference&lt;Car&gt; weakCar = new WeakReference&lt;Car&gt;(car);    int i=0;    while(true){        if(weakCar.get()!=null){            i++;            System.out.println("Object is alive for "+i+" loops - "+weakCar);        }else{            System.out.println("Object has been collected.");            break;        }    }}</code></pre><p>}<br>在上例中, 程序运行一段时间后, 程序打印出”Object has been collected.” 说明, weak reference指向的对象的被回收了.<br>值得注意的一点 , 即使有 car 引用指向对象, 且 car 是一个strong reference, weak reference weakCar指向的对象仍然被回收了. 这是因为java的编译器在发现进入while循环之后, car 已经没有被使用了, 所以进行了优化(将其置空?). 当把TestWeakReference.java修改为:<br>package weakreference;</p><p>import java.lang.ref.WeakReference; /** * @author wison */<br>public class TestWeakReference {</p><pre><code>public static void main(String[] args) {        Car car = new Car(22000,"silver");    WeakReference&lt;Car&gt; weakCar = new WeakReference&lt;Car&gt;(car);        int i=0;        while(true){        System.out.println("here is the strong reference 'car' "+car);        if(weakCar.get()!=null){            i++;            System.out.println("Object is alive for "+i+" loops - "+weakCar);        }else{            System.out.println("Object has been collected.");            break;        }    }}</code></pre><p>}<br>weak reference指向的object就不会被回收了. 因为还有一个strong reference car 指向它.<br>WeakReference的一个特点是它何时被回收是不可确定的, 因为这是由GC运行的不确定性所确定的. 所以, 一般用weak reference引用的对象是有价值被cache, 而且很容易被重新被构建, 且很消耗内存的对象.</p><h2 id="ReferenceQueue与其他类型的references"><a href="#ReferenceQueue与其他类型的references" class="headerlink" title="ReferenceQueue与其他类型的references"></a>ReferenceQueue与其他类型的references</h2><p>在weak reference指向的对象被回收后, weak reference本身其实也就没有用了. java提供了一个ReferenceQueue来保存这些所指向的对象已经被回收的reference. 用法是在定义WeakReference的时候将一个ReferenceQueue的对象作为参数传入构造函数.<br>soft reference和weak reference一样, 但被GC回收的时候需要多一个条件: 当系统内存不足时(GC是如何判定系统内存不足? 是否有参数可以配置这个threshold?), soft reference指向的object才会被回收. 正因为有这个特性, soft reference比weak reference更加适合做cache objects的reference. 因为它可以尽可能的retain cached objects, 减少重建他们所需的时间和消耗.</p><p>文档参考自Java弱引用(WeakReference)的理解与使用</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/blog/2023/04/04/zhu-jie/"/>
+      <url>/blog/2023/04/04/zhu-jie/</url>
+      
+        <content type="html"><![CDATA[<p><strong>SuppressLint</strong><br>Lint是一个静态检查器，它围绕Android项目的正确性、安全性、性能、可用性以及可访问性进行分析。它检查的对象包括XML资源、位图、ProGuard配置文件、源文件甚至编译后的字节码。Lint包含了API版本检查、性能检查以及其他诸多特性。可以使用@SuppressLint标注忽略指定的警告。如果想去掉的话，可以右键点工程，然后在android tools 中，选择 clear lint marker 就没有这个错误了<br>其实，既然程序会报出这样的警告，肯定就会有他的不合理之处，只是并不会导致程序发生错误无法运行，我们写的代码平时也不多，所以一般对我们的程序不会有多大的影响，但是他会影响整个程序的安全性及一些其他性能，所以我们还是尽量去避免这写不合理之处。<br><a href="https://blog.csdn.net/pangjl1982/article/details/86699164"><em>链接</em></a></p><p><strong>Android Lint扫描规则说明</strong><br><strong>SetTextI18n</strong><br>TextView国际化：在调用TextView.setText()给TextView赋值时，不能使用Number.toString()例如图中的Integer.toString(mProfile.getLeftStarCount())把数字转为字符串赋值，因为Number.toString()不能正确处理分隔符和特定语言环境中的数字。<br>建议使用 String.format() 指定合适的占位符进行赋值。<br>不能直接使用文本给TextView.setText()，具体参照HardcodedText的说明。代码中可以使用@SuppressLint(“SetTextI18n”) 禁用lint的这项检查。<br><a href="https://blog.csdn.net/weixin_34342578/article/details/93179048">链接</a></p><h3 id="Target、-Retention、-Documented注解简介"><a href="#Target、-Retention、-Documented注解简介" class="headerlink" title="@Target、@Retention、@Documented注解简介"></a>@Target、@Retention、@Documented注解简介</h3><h4 id="Target"><a href="#Target" class="headerlink" title="@Target"></a>@Target</h4><p>@Target注解用于定义注解的使用位置，如果没有该项，表示注解可以用于任何地方。@Target的格式为：<br>``// 单参数<br>@Target({ ElementType.METHOD })<br>// 多参数<br>@Target(value = {ElementType.METHOD,ElementType.TYPE})</p><p>@Target的ElementType取值有以下类型：<br>TYPE：类，接口或者枚举<br>FIELD：域，包含枚举常量<br>METHOD：方法<br>PARAMETER：参数<br>CONSTRUCTOR：构造方法<br>LOCAL_VARIABLE：局部变量<br>ANNOTATION_TYPE：注解类型<br>PACKAGE：包</p><h3 id="Retention"><a href="#Retention" class="headerlink" title="@Retention"></a>@Retention</h3><p>@Retention注解用于指明修饰的注解的生存周期，即会保留到哪个阶段。格式为：<br>@Retention(RetentionPolicy.RUNTIME)</p><p>RetentionPolicy的取值包含以下三种：<br>SOURCE：源码级别保留，编译后即丢弃。<br>CLASS：编译级别保留，编译后的class文件中存在，在jvm运行时丢弃，这是默认值。<br>RUNTIME：运行级别保留，编译后的class文件中存在，在jvm运行时保留，可以被反射调用。</p><h3 id="Documented"><a href="#Documented" class="headerlink" title="@Documented"></a>@Documented</h3><p>指明修饰的注解，可以被例如javadoc此类的工具文档化，只负责标记，没有成员取值</p><h3 id="Inherited"><a href="#Inherited" class="headerlink" title="@Inherited"></a>@Inherited</h3><p>@Inherited注解用于标注一个父类的注解是否可以被子类继承，如果一个注解需要被其子类所继承，则在声明时直接使用@Inherited注解即可。如果没有写此注解，则无法被子类继承。<br><a href="https://blog.csdn.net/mu_wind/article/details/102755071">链接</a></p><h3 id="NonNull"><a href="#NonNull" class="headerlink" title="@NonNull"></a>@NonNull</h3><p>在构造函数的参数加上@NonNull后，便会自动对该参数值进行判空。<br> public Student(@NonNull String name, Integer age) {<br>        this.name = name;<br>        this.age = age;<br>    }<br>编译该工程，打开编译后的文件。可以看到，编译器已经为形参name生成了判空的代码。<br><img src="https://cdn.nlark.com/yuque/0/2023/png/35026251/1676277456866-90aaa6a8-837d-4b9c-9eca-b1ad26e7abf5.png#averageHue=%236f9aa1&amp;clientId=u88ba9fbd-00dc-4&amp;from=paste&amp;id=u9d06e844&amp;name=image.png&amp;originHeight=942&amp;originWidth=1455&amp;originalType=url&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=477946&amp;status=done&amp;style=none&amp;taskId=u282ed702-0744-46ab-999c-9801e156511&amp;title=" alt="image.png"></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/blog/2023/04/04/android-message-fen-xi/"/>
+      <url>/blog/2023/04/04/android-message-fen-xi/</url>
+      
+        <content type="html"><![CDATA[<p><img src="https://cdn.nlark.com/yuque/0/2023/png/35026251/1676278491660-7a5beb77-5ad2-45f0-ad13-efb41d59db02.png#averageHue=%23dcceb3&amp;clientId=u5b262a7e-7732-4&amp;from=paste&amp;id=u25da6433&amp;name=image.png&amp;originHeight=809&amp;originWidth=1200&amp;originalType=url&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=1524008&amp;status=done&amp;style=none&amp;taskId=ud2b63ac5-3efb-40a2-afdf-82756ea5c98&amp;title=" alt="image.png"><br><a href="https://www.jianshu.com/p/43bb31d8a742">Android Handler机制之总目录</a></p><h3 id="Message携带信息"><a href="#Message携带信息" class="headerlink" title="Message携带信息"></a>Message携带信息</h3><p>对Message携带信息进行简单的分析（英文谷歌渣翻）</p><p>/**</p><ul><li>用户定义的消息代码，以便当接受到消息是关于什么的。其中每个Hanler都有自己的命名控件，不用担心会冲突</li><li>/<br>public int what;<br>/**</li><li>如果你只想存很少的整形数据，那么可以考虑使用arg1与arg2,</li><li>如果需要传输很多数据可以使用Message中的setData(Bundle bundle)</li><li>/<br>public int arg1;<br>/**</li><li>如果你只想存很少的整形数据，那么可以考虑使用arg1与arg2,</li><li>如果需要传输很多数据可以使用Message中的setData(Bundle bundle)</li><li>/<br>public int arg2;<br>/**</li><li>发送给接受方的任意对象，在使用跨进程的时候要注意obj不能为null</li><li>/<br>public Object obj;<br>/**</li><li>在使用跨进程通信Messenger时，可以确定需要谁来接收</li><li>/<br>public Messenger replyTo;<br>/**</li><li>在使用跨进程通信Messenger时，可以确定需要发消息的uid</li><li>/<br>public int sendingUid = -1;<br>/**</li><li>如果数据比较多，可以直接使用Bundle进行数据的传递</li><li>/<br>Bundle data;</li></ul><p><a href="https://www.jianshu.com/p/d0ef4edd4407">Android Handler机制之Message及Message回收机制</a></p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/blog/2023/04/04/fragmentpageradapter-de-yong-fa-xiang-jie/"/>
+      <url>/blog/2023/04/04/fragmentpageradapter-de-yong-fa-xiang-jie/</url>
+      
+        <content type="html"><![CDATA[<p>FragmentPagerAdapter是PagerAdapter中的其中一种实现。它将每一个页面表示为一个 Fragment，并且每一个Fragment都将会保存到fragment manager当中。而且，当用户没可能再次回到页面的时候，fragment manager才会将这个Fragment销毁。</p><p>这种pager十分适用于有一些静态fragment，例如一组tabs，的时候使用。每个页面对应的Fragment当用户可以访问的时候会一直存在内存中，但是，当这个页面不可见的时候，view hierarchy将会被销毁。这样子会导致应用程序占有太多资源。当页面数量比较大的时候，建议使用 FragmentStatePagerAdapter。</p><p>当使用FragmentPagerAdapter的时候，ViewPager一定要使用正确的ID set。</p><p>FragmentPagerAdapter的子类只要实现 getItem(int) 和 getCount()方法。</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/blog/2023/04/04/android-xxpermissions-quan-xian-qing-qiu-kuang-jia/"/>
+      <url>/blog/2023/04/04/android-xxpermissions-quan-xian-qing-qiu-kuang-jia/</url>
+      
+        <content type="html"><![CDATA[<p>在日常的开发当中，肯定需要使用到一些Google官方定义的危险权限，这个时候就需要用到权限请求框架了，网上有很多开源的权限请求框架，我们可以避免重复造轮子，又可以节省我们的开发时间。分享一下我常用的XXPermissions权限请求框架。<br><a name="L9x09"></a></p><h3 id="导入依赖"><a href="#导入依赖" class="headerlink" title="导入依赖"></a>导入依赖</h3><p>implementation ‘com.github.getActivity:XXPermissions:13.2’ <br>13.2是我写博客时的最新版本。还需要在项目的build.gradle中加入下面语句：<br>buildscript {     repositories {         maven { url ‘<a href="https://jitpack.io&amp;/#39;">https://jitpack.io'</a> }     } } <br>这样就是第一步导入依赖。<br><a name="FQLvq"></a></p><h3 id="针对Android分区特性处理"><a href="#针对Android分区特性处理" class="headerlink" title="针对Android分区特性处理"></a>针对Android分区特性处理</h3><p>我们就需要在AndroidManifest.xml中，加入下面的代码：<br><manifest>     <application>         <!-- 表示当前项目已经适配了分区存储特性 -->         <meta-data android:name="ScopedStorage" android:value="true">     </meta-data></application> </manifest><br><a name="C7sFA"></a></p><h3 id="链式请求权限代码"><a href="#链式请求权限代码" class="headerlink" title="链式请求权限代码"></a>链式请求权限代码</h3><p>简单做一个权限请求的示例：<br>XXPermissions.with(this)         // 申请单个权限         .permission(Permission.RECORD_AUDIO)         // 申请多个权限         //.permission(Permission.Group.CALENDAR)         // 申请安装包权限         //.permission(Permission.REQUEST_INSTALL_PACKAGES)         // 申请悬浮窗权限         //.permission(Permission.SYSTEM_ALERT_WINDOW)         // 申请通知栏权限         //.permission(Permission.NOTIFICATION_SERVICE)         // 申请系统设置权限         //.permission(Permission.WRITE_SETTINGS)         // 设置权限请求拦截器         //.interceptor(new PermissionInterceptor())         // 设置不触发错误检测机制         //.unchecked()         .request(new OnPermissionCallback() {             @Override             public void onGranted(List<string> permissions, boolean all) {                 if (all) {                     toast(“获取录音和日历权限成功”);                 } else {                     toast(“获取部分权限成功，但部分权限未正常授予”);                 }             }             @Override             public void onDenied(List<string> permissions, boolean never) {                 if (never) {                     toast(“被永久拒绝授权，请手动授予录音和日历权限”);                     // 如果是被永久拒绝就跳转到应用权限系统设置页面                     XXPermissions.startPermissionActivity(MainActivity.this, permissions);                 } else {                     toast(“获取录音和日历权限失败”);                 }             }         }); <br>这样动态申请高危的权限是不是很简单呢？我就喜欢这样去申请权限，方便快捷。<br><a name="tZ3kk"></a></string></string></p><h3 id="跳转到系统权限页面返回处理"><a href="#跳转到系统权限页面返回处理" class="headerlink" title="跳转到系统权限页面返回处理"></a>跳转到系统权限页面返回处理</h3><p>可能前面的用户就是不肯给权限的情况，框架支持跳转到系统权限界面，从系统权限界面返回，我们可以这样处理：<br>public class XxxActivity extends AppCompatActivity {     @Override     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {         super.onActivityResult(requestCode, resultCode, data);         if (requestCode == XXPermissions.REQUEST_CODE) {             if (XXPermissions.isGranted(this, Permission.RECORD_AUDIO) &amp;&amp;                     XXPermissions.isGranted(this, Permission.Group.CALENDAR)) {                 toast(“用户已经在权限设置页授予了录音和日历权限”);             } else {                 toast(“用户没有在权限设置页授予权限”);             }         }     } }<br><a name="Ffsca"></a></p><h3 id="框架其他的API"><a href="#框架其他的API" class="headerlink" title="框架其他的API"></a>框架其他的API</h3><p>上面说的是简单的事情，开源博主还提供了另外的API，也可以了解一下。<br>1.判断一个或多个权限是否全部授予了：<br>XXPermissions.isGranted(Context context, String… permissions); <br>2.获取没有授予的权限：<br>XXPermissions.getDenied(Context context, String… permissions); <br>3.判断某个权限是否为特殊权限：<br>XXPermissions.isSpecial(String permission); <br>4.判断一个或多个权限是否被永久拒绝了：<br>XXPermissions.isPermanentDenied(Activity activity, String… permissions); <br>5.跳转到应用权限设置页，可以传入三种不同的上下文：<br>XXPermissions.startPermissionActivity(Context context, String… permissions); XXPermissions.startPermissionActivity(Activity activity, String… permissions); XXPermissions.startPermissionActivity(Fragment fragment, String… permissions); <br>6.设置不触发错误检测机制（全局设置）:<br>XXPermissions.setCheckMode(false); <br>7.设置权限申请拦截器（全局设置）:<br>XXPermissions.setInterceptor(new IPermissionInterceptor() {});</p><p>作者：阿博的梦呓<br>链接：<a href="https://www.jianshu.com/p/ffb01de0540e">https://www.jianshu.com/p/ffb01de0540e</a><br>来源：简书<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>]]></content>
+      
+      
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>设计模式之建造者模式</title>
       <link href="/blog/2023/03/14/she-ji-mo-shi-zhi-jian-zao-zhe-mo-shi/"/>
       <url>/blog/2023/03/14/she-ji-mo-shi-zhi-jian-zao-zhe-mo-shi/</url>

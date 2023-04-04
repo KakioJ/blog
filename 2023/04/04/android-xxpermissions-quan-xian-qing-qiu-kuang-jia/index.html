@@ -4,8 +4,9 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="keywords" content="设计模式之建造者模式, KakioJ&#39;s Room">
-    <meta name="description" content="">
+    <meta name="keywords" content="KakioJ&#39;s Room">
+    <meta name="description" content="在日常的开发当中，肯定需要使用到一些Google官方定义的危险权限，这个时候就需要用到权限请求框架了，网上有很多开源的权限请求框架，我们可以避免重复造轮子，又可以节省我们的开发时间。分享一下我常用的XXPermissions权限请求框架。
+">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -17,7 +18,7 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
 
 
-    <title>设计模式之建造者模式 | KakioJ&#39;s Room</title>
+    <title>KakioJ&#39;s Room</title>
     <link rel="icon" type="image/png" href="/blog/favicon.png">
     
     <style>
@@ -239,12 +240,12 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/blog/medias/featureimages/13.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/blog/medias/featureimages/0.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
-                    <h1 class="description center-align post-title">设计模式之建造者模式</h1>
+                    <h1 class="description center-align post-title"></h1>
                 </div>
             </div>
         </div>
@@ -280,7 +281,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2023-03-14
+                    2023-04-04
                 </div>
                 
 
@@ -304,7 +305,14 @@
 
         <div class="card-content article-card-content">
             <div id="articleContent">
-                
+                <p>在日常的开发当中，肯定需要使用到一些Google官方定义的危险权限，这个时候就需要用到权限请求框架了，网上有很多开源的权限请求框架，我们可以避免重复造轮子，又可以节省我们的开发时间。分享一下我常用的XXPermissions权限请求框架。<br><a name="L9x09"></a></p>
+<h3 id="导入依赖"><a href="#导入依赖" class="headerlink" title="导入依赖"></a>导入依赖</h3><p>implementation ‘com.github.getActivity:XXPermissions:13.2’ <br>13.2是我写博客时的最新版本。还需要在项目的build.gradle中加入下面语句：<br>buildscript {     repositories {         maven { url ‘<a target="_blank" rel="noopener" href="https://jitpack.io&amp;/#39;">https://jitpack.io'</a> }     } } <br>这样就是第一步导入依赖。<br><a name="FQLvq"></a></p>
+<h3 id="针对Android分区特性处理"><a href="#针对Android分区特性处理" class="headerlink" title="针对Android分区特性处理"></a>针对Android分区特性处理</h3><p>我们就需要在AndroidManifest.xml中，加入下面的代码：<br><manifest>     <application>         <!-- 表示当前项目已经适配了分区存储特性 -->         <meta-data android:name="ScopedStorage" android:value="true">     </meta-data></application> </manifest><br><a name="C7sFA"></a></p>
+<h3 id="链式请求权限代码"><a href="#链式请求权限代码" class="headerlink" title="链式请求权限代码"></a>链式请求权限代码</h3><p>简单做一个权限请求的示例：<br>XXPermissions.with(this)         // 申请单个权限         .permission(Permission.RECORD_AUDIO)         // 申请多个权限         //.permission(Permission.Group.CALENDAR)         // 申请安装包权限         //.permission(Permission.REQUEST_INSTALL_PACKAGES)         // 申请悬浮窗权限         //.permission(Permission.SYSTEM_ALERT_WINDOW)         // 申请通知栏权限         //.permission(Permission.NOTIFICATION_SERVICE)         // 申请系统设置权限         //.permission(Permission.WRITE_SETTINGS)         // 设置权限请求拦截器         //.interceptor(new PermissionInterceptor())         // 设置不触发错误检测机制         //.unchecked()         .request(new OnPermissionCallback() {             @Override             public void onGranted(List<string> permissions, boolean all) {                 if (all) {                     toast(“获取录音和日历权限成功”);                 } else {                     toast(“获取部分权限成功，但部分权限未正常授予”);                 }             }             @Override             public void onDenied(List<string> permissions, boolean never) {                 if (never) {                     toast(“被永久拒绝授权，请手动授予录音和日历权限”);                     // 如果是被永久拒绝就跳转到应用权限系统设置页面                     XXPermissions.startPermissionActivity(MainActivity.this, permissions);                 } else {                     toast(“获取录音和日历权限失败”);                 }             }         }); <br>这样动态申请高危的权限是不是很简单呢？我就喜欢这样去申请权限，方便快捷。<br><a name="tZ3kk"></a></string></string></p>
+<h3 id="跳转到系统权限页面返回处理"><a href="#跳转到系统权限页面返回处理" class="headerlink" title="跳转到系统权限页面返回处理"></a>跳转到系统权限页面返回处理</h3><p>可能前面的用户就是不肯给权限的情况，框架支持跳转到系统权限界面，从系统权限界面返回，我们可以这样处理：<br>public class XxxActivity extends AppCompatActivity {     @Override     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {         super.onActivityResult(requestCode, resultCode, data);         if (requestCode == XXPermissions.REQUEST_CODE) {             if (XXPermissions.isGranted(this, Permission.RECORD_AUDIO) &amp;&amp;                     XXPermissions.isGranted(this, Permission.Group.CALENDAR)) {                 toast(“用户已经在权限设置页授予了录音和日历权限”);             } else {                 toast(“用户没有在权限设置页授予权限”);             }         }     } }<br><a name="Ffsca"></a></p>
+<h3 id="框架其他的API"><a href="#框架其他的API" class="headerlink" title="框架其他的API"></a>框架其他的API</h3><p>上面说的是简单的事情，开源博主还提供了另外的API，也可以了解一下。<br>1.判断一个或多个权限是否全部授予了：<br>XXPermissions.isGranted(Context context, String… permissions); <br>2.获取没有授予的权限：<br>XXPermissions.getDenied(Context context, String… permissions); <br>3.判断某个权限是否为特殊权限：<br>XXPermissions.isSpecial(String permission); <br>4.判断一个或多个权限是否被永久拒绝了：<br>XXPermissions.isPermanentDenied(Activity activity, String… permissions); <br>5.跳转到应用权限设置页，可以传入三种不同的上下文：<br>XXPermissions.startPermissionActivity(Context context, String… permissions); XXPermissions.startPermissionActivity(Activity activity, String… permissions); XXPermissions.startPermissionActivity(Fragment fragment, String… permissions); <br>6.设置不触发错误检测机制（全局设置）:<br>XXPermissions.setCheckMode(false); <br>7.设置权限申请拦截器（全局设置）:<br>XXPermissions.setInterceptor(new IPermissionInterceptor() {});</p>
+<p>作者：阿博的梦呓<br>链接：<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/ffb01de0540e">https://www.jianshu.com/p/ffb01de0540e</a><br>来源：简书<br>著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+
                 
             </div>
             <hr/>
@@ -330,7 +338,7 @@
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://KakioJ.github.io/blog/blog/2023/03/14/she-ji-mo-shi-zhi-jian-zao-zhe-mo-shi/">https://KakioJ.github.io/blog/blog/2023/03/14/she-ji-mo-shi-zhi-jian-zao-zhe-mo-shi/</a>
+                    <a href="https://KakioJ.github.io/blog/blog/2023/04/04/android-xxpermissions-quan-xian-qing-qiu-kuang-jia/">https://KakioJ.github.io/blog/blog/2023/04/04/android-xxpermissions-quan-xian-qing-qiu-kuang-jia/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -448,7 +456,7 @@
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/blog/2023/04/04/android-xxpermissions-quan-xian-qing-qiu-kuang-jia/">
+                <a href="/blog/2023/04/04/fragmentpageradapter-de-yong-fa-xiang-jie/">
                     <div class="card-image">
                         
                         
@@ -482,7 +490,7 @@
         
         <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge right-badge text-color">
-                本篇&nbsp;<i class="far fa-dot-circle"></i>
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
                 <a href="/blog/2023/03/14/she-ji-mo-shi-zhi-jian-zao-zhe-mo-shi/">
@@ -512,7 +520,6 @@
                         </span>
                     </div>
                 </div>
-
                 
             </div>
         </div>

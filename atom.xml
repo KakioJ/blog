@@ -6,7 +6,7 @@
   <link href="https://kakioj.github.io/blog/atom.xml" rel="self"/>
   
   <link href="https://kakioj.github.io/blog/"/>
-  <updated>2023-03-14T02:09:22.075Z</updated>
+  <updated>2023-04-04T03:40:21.493Z</updated>
   <id>https://kakioj.github.io/blog/</id>
   
   <author>
@@ -15,6 +15,111 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title></title>
+    <link href="https://kakioj.github.io/blog/2023/04/04/java-ruo-yin-yong-weakreference-de-li-jie-yu-shi-yong/"/>
+    <id>https://kakioj.github.io/blog/2023/04/04/java-ruo-yin-yong-weakreference-de-li-jie-yu-shi-yong/</id>
+    <published>2023-04-04T03:40:19.080Z</published>
+    <updated>2023-04-04T03:40:21.493Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;&lt;strong&gt;弱引用引入的原因&lt;/strong&gt;&lt;br&gt;正常情况下，当一个对象o被创建时, 它被放在Heap里. 当GC运行的时候, 如果发现没有任何引用指向o,</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="https://kakioj.github.io/blog/2023/04/04/zhu-jie/"/>
+    <id>https://kakioj.github.io/blog/2023/04/04/zhu-jie/</id>
+    <published>2023-04-04T03:40:09.219Z</published>
+    <updated>2023-04-04T03:40:10.892Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;&lt;strong&gt;SuppressLint&lt;/strong&gt;&lt;br&gt;Lint是一个静态检查器，它围绕Android项目的正确性、安全性、性能、可用性以及可访问性进行分析。它检查的对象包括XML资源、位图、ProGuard配置文件、源文件甚至编译后的字节码。Lint包含了API</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="https://kakioj.github.io/blog/2023/04/04/android-message-fen-xi/"/>
+    <id>https://kakioj.github.io/blog/2023/04/04/android-message-fen-xi/</id>
+    <published>2023-04-04T03:39:58.831Z</published>
+    <updated>2023-04-04T03:40:01.283Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;&lt;img</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="https://kakioj.github.io/blog/2023/04/04/fragmentpageradapter-de-yong-fa-xiang-jie/"/>
+    <id>https://kakioj.github.io/blog/2023/04/04/fragmentpageradapter-de-yong-fa-xiang-jie/</id>
+    <published>2023-04-04T03:39:48.589Z</published>
+    <updated>2023-04-04T03:39:50.526Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;FragmentPagerAdapter是PagerAdapter中的其中一种实现。它将每一个页面表示为一个 Fragment，并且每一个Fragment都将会保存到fragment manager当中。而且，当用户没可能再次回到页面的时候，fragment</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title></title>
+    <link href="https://kakioj.github.io/blog/2023/04/04/android-xxpermissions-quan-xian-qing-qiu-kuang-jia/"/>
+    <id>https://kakioj.github.io/blog/2023/04/04/android-xxpermissions-quan-xian-qing-qiu-kuang-jia/</id>
+    <published>2023-04-04T03:38:45.443Z</published>
+    <updated>2023-04-04T03:39:35.782Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;p&gt;在日常的开发当中，肯定需要使用到一些Google官方定义的危险权限，这个时候就需要用到权限请求框架了，网上有很多开源的权限请求框架，我们可以避免重复造轮子，又可以节省我们的开发时间。分享一下我常用的XXPermissions权限请求框架。&lt;br&gt;&lt;a</summary>
+        
+      
+    
+    
+    
+    
+  </entry>
   
   <entry>
     <title>设计模式之建造者模式</title>
